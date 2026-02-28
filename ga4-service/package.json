@@ -1,0 +1,16 @@
+{
+  "name": "ga4-service",
+  "version": "1.0.0",
+  "description": "Google Analytics 4 data microservice",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "node src/main.js"
+  },
+  "dependencies": {
+    "@google-analytics/data": "^4.3.0",
+    "amqplib": "^0.10.4",
+    "axios": "^1.7.2",
+    "google-auth-library": "^9.6.3",
+    "dotenv": "^16.0.3"
+  }
+}

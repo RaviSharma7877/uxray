@@ -1,0 +1,14 @@
+{
+  "name": "design-analysis-service",
+  "version": "1.0.0",
+  "description": "Design input processor for UX analysis",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "node src/main.js"
+  },
+  "dependencies": {
+    "amqplib": "^0.10.4",
+    "axios": "^1.7.2",
+    "puppeteer": "^22.10.0"
+  }
+}

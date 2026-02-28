@@ -1,0 +1,142 @@
+server:
+  port: 8080
+  tomcat:
+    max-http-form-post-size: -1
+    max-swallow-size: -1
+
+spring:
+  # MySQL Database Configuration
+  datasource:
+    url: jdbc:mysql://localhost:3306/uxray?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:REPLACEME}
+  
+  # RabbitMQ Configuration
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:guest}
+    password: ${RABBITMQ_PASSWORD:guest}
+  
+  # JPA Configuration
+  jpa:
+    hibernate:
+      ddl-auto: update  # Options: none, validate, update, create, create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        jdbc:
+          time_zone: UTC
+  servlet:
+    multipart:
+      max-file-size: ${STORAGE_MAX_FILE_SIZE_MB:5000}MB
+      max-request-size: ${STORAGE_MAX_FILE_SIZE_MB:5000}MB
+  
+  # Flyway Configuration (Optional - for database migrations)
+  flyway:
+    enabled: false  # Set to true if you want to use Flyway migrations
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+  
+  jackson:
+    serialization:
+      WRITE_DATES_AS_TIMESTAMPS: false
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID:REPLACEME}
+            client-secret: ${GOOGLE_CLIENT_SECRET:REPLACEME}
+            scope:
+              - https://www.googleapis.com/auth/userinfo.profile
+              - https://www.googleapis.com/auth/userinfo.email
+              - https://www.googleapis.com/auth/analytics.readonly
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            client-authentication-method: client_secret_basic
+            authorization-grant-type: authorization_code
+          azure:
+            client-id: ${AZURE_CLIENT_ID:REPLACEME}
+            client-secret: ${AZURE_CLIENT_SECRET:REPLACEME}
+            scope:
+              - openid
+              - profile
+              - email
+              - https://graph.microsoft.com/User.Read
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            client-authentication-method: client_secret_basic
+            authorization-grant-type: authorization_code
+        provider:
+          google:
+            authorization-uri: https://accounts.google.com/o/oauth2/v2/auth?access_type=offline&prompt=consent
+            token-uri: https://oauth2.googleapis.com/token
+            user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
+            user-name-attribute: sub
+          azure:
+            authorization-uri: https://login.microsoftonline.com/${AZURE_TENANT_BASE:common}/oauth2/v2.0/authorize
+            token-uri: https://login.microsoftonline.com/${AZURE_TENANT_BASE:common}/oauth2/v2.0/token
+            user-info-uri: https://graph.microsoft.com/v1.0/me
+            user-name-attribute: id
+
+app:
+  frontend-origin: http://localhost:3000
+  queues:
+    screenshot: screenshot-jobs-queue
+    lighthouse: lighthouse-audits-queue
+    design-analysis: design-analysis-queue
+    ga4: ga4-analytics-queue
+    clarity: clarity-analytics-queue
+  oauth:
+    success-redirect: http://localhost:3000
+  ai:
+    # Gemini API key - Set via environment variable GEMINI_API_KEY or provide here
+    # Get your API key from: https://makersuite.google.com/app/apikey
+    api-key: ${GEMINI_API_KEY:REPLACEME}
+    # Default model: gemini-2.5-flash (newer, faster model)
+    # Other options: gemini-pro, gemini-1.5-pro, gemini-1.5-flash
+    model: ${GEMINI_MODEL:gemini-2.5-flash}
+    temperature: ${GEMINI_TEMPERATURE:0.35}
+    # Max output tokens - leave unset or set to null/0 to use model's default
+    # Model defaults: gemini-2.5-flash: 8192, gemini-1.5-pro: 8192, gemini-pro: 2048
+    # Set GEMINI_MAX_OUTPUT_TOKENS environment variable to override with custom value
+    # max-output-tokens: ${GEMINI_MAX_OUTPUT_TOKENS:}
+    # Vertex AI configuration (optional, for future use)
+    vertex:
+      use-vertex: ${GOOGLE_GENAI_USE_VERTEXAI:false}
+      project-id: ${GOOGLE_CLOUD_PROJECT:}
+      location: ${GOOGLE_CLOUD_LOCATION:us-central1}
+  aws:
+    # --- AWS Configuration ---
+    # Mode: 'static' for direct credentials, 'assume-role' for STS role assumption
+    mode: ${APP_AWS_MODE:static}
+    default-region: ${APP_AWS_DEFAULT_REGION:us-east-1}
+    base:
+      access-key-id: ${APP_AWS_ACCESS_KEY_ID:REPLACEME}
+      secret-access-key: ${APP_AWS_SECRET_ACCESS_KEY:REPLACEME}
+      session-token: ${APP_AWS_SESSION_TOKEN:} # optional, only if using temporary credentials
+    sts:
+      # Note: role-arn must be a ROLE ARN (arn:aws:iam::ACCOUNT:role/ROLENAME), not a USER ARN
+      # Only used when mode=assume-role
+      role-arn: ${APP_AWS_ROLE_ARN:}
+      external-id: ${APP_AWS_EXTERNAL_ID:}
+      session-duration-seconds: ${APP_AWS_SESSION_DURATION_SECONDS:3600}
+  clarity:
+    enabled: ${CLARITY_ENABLED:false}
+    project-id: ${CLARITY_PROJECT_ID:}
+    api-key: ${CLARITY_API_KEY:}
+    base-url: ${CLARITY_API_BASE:https://api.clarity.ms/v1}
+    lookback-days: ${CLARITY_LOOKBACK_DAYS:7}
+    top-entries: ${CLARITY_TOP_ENTRIES:5}
+    refresh-interval: ${CLARITY_REFRESH_INTERVAL:PT15M}
+
+storage:
+  bucket-name: ${STORAGE_BUCKET_NAME:heatmap.e2shub}
+  screenshot-prefix: ${STORAGE_SCREENSHOT_PREFIX:screenshots}
+  heatmap-prefix: ${STORAGE_HEATMAP_PREFIX:heatmap}
+  design-prefix: ${STORAGE_DESIGN_PREFIX:designs}
+  use-domain-folders: ${STORAGE_USE_DOMAIN_FOLDERS:true}
+  cdn-base-url: ${STORAGE_CDN_BASE_URL:https://d2sdbrggjmki87.cloudfront.net}
+  max-file-size-mb: ${STORAGE_MAX_FILE_SIZE_MB:5000}

@@ -1,0 +1,15 @@
+{
+  "name": "lighthouse-service",
+  "version": "1.0.0",
+  "description": "Lighthouse audit worker",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "node src/main.js"
+  },
+  "dependencies": {
+    "amqplib": "^0.10.4",
+    "axios": "^1.7.2",
+    "chrome-launcher": "^1.1.0",
+    "lighthouse": "^12.0.0"
+  }
+}

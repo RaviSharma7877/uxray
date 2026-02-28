@@ -1,0 +1,15 @@
+{
+  "name": "clarity-service",
+  "version": "1.0.0",
+  "description": "Microsoft Clarity data microservice",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "node src/main.js"
+  },
+  "dependencies": {
+    "amqplib": "^0.10.4",
+    "axios": "^1.7.2",
+    "dotenv": "^16.0.3"
+  }
+}
+
